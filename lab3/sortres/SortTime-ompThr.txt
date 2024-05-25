@@ -1,0 +1,61 @@
+std::cout<<"Initialize end\n";
+    ofstream out1("SortTime.txt");
+    int n_threads = 8;
+    LARGE_INTEGER head, tail, freq;
+    for(int t=1;t<=256;t<<=1)
+    {
+        int x0;
+        matCoo W(2048,2048);
+        for (int i = 2048; i >=0 ; i--) {
+            for (int j = 2047; j>=0  ; j--) {
+                double v = rand() / (double)RAND_MAX;
+                x0=rand();
+                W.elem.push_back({v, x0, j});
+            }
+        }
+        cout<<"T="<<t<<endl;
+        for(int i=1;i<=3;i++)
+        {
+            QueryPerformanceFrequency(&freq);
+            QueryPerformanceCounter(&head);
+            for (int j = 0; j < 10; j++){
+                switch(i)
+                {
+                    // case 1:openmp_sort1(W.elem,n_threads);break;
+                    case 1:if(t<16){openmp_sort2(W.elem,t);}break;
+                    case 2:openmp_sort3(W.elem,t);break;
+                    case 3:openmp_sort(W.elem,t);break;
+                    // case 2:openmp_sort(W.elem,t);break;
+                    // case 3:multi_thread_sort(W.elem, t);break;
+                    // case 4:std::sort(W.elem.begin(),W.elem.end());break;
+                }            
+            }
+            QueryPerformanceCounter(&tail);
+            if(t<=8||i!=1){
+                cout <<i<< ": Time Elapsed: " << (tail.QuadPart - head.QuadPart) * 1000.0 / freq.QuadPart << "ms" << endl;
+                out1<<t<<","<<i<<","<<(tail.QuadPart - head.QuadPart) * 1000.0 / freq.QuadPart<<endl;
+            }
+        }
+    }
+1,1,8299.19
+1,2,7688.18
+1,3,7684.96
+2,1,4251.89
+2,2,3930.48
+2,3,3937.76
+4,1,2308.76
+4,2,2072.95
+4,3,2072.72
+8,1,1554.8
+8,2,1304.98
+8,3,1295.82
+16,2,27068.9
+16,3,1076.26
+32,2,5800.97
+32,3,1031.6
+64,2,3494.9
+64,3,1002.83
+128,2,4083
+128,3,983.004
+256,2,7143.82
+256,3,966.3
